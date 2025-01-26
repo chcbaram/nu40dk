@@ -1,0 +1,6 @@
+if BOARD_NU40DK
+
+config BT_CTLR
+	default BT
+
+endif # BOARD_NU40DK

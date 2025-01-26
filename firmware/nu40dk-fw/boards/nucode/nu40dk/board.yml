@@ -1,0 +1,5 @@
+board:
+  name: nu40dk
+  vendor: nucode
+  socs:
+    - name: nrf52840
