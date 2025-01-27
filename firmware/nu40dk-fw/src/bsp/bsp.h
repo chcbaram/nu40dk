@@ -7,7 +7,7 @@ extern "C" {
 
 #include "def.h"
 
-
+#include <hal/nrf_gpio.h>
 #include <zephyr/kernel.h>
 
 
