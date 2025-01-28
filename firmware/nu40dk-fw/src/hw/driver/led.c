@@ -3,20 +3,35 @@
 
 #ifdef _USE_HW_LED
 #include "cli.h"
+// #include <zephyr/kernel.h>
+// #include <zephyr/device.h>
+// #include <zephyr/devicetree.h>
+#include <zephyr/drivers/gpio.h>
 
+
+enum
+{
+  HW_TYPE_NRF,
+  HW_TYPE_DT
+};
 
 typedef struct
 {
-  uint32_t  pin;
+  uint8_t   type;
+  struct gpio_dt_spec *p_dt;  
+  uint32_t  pin;  
   uint8_t   on_state;
   uint8_t   off_state;
 } led_tbl_t;
 
 
-led_tbl_t led_tbl[LED_MAX_CH] =
-    {
-        {NRF_GPIO_PIN_MAP(0, 13), _DEF_HIGH, _DEF_LOW}, // LED1
-    };
+static struct gpio_dt_spec dt_led2 = GPIO_DT_SPEC_GET(DT_NODELABEL(led2), gpios);
+
+
+const led_tbl_t led_tbl[LED_MAX_CH] = {
+  {HW_TYPE_NRF, NULL, NRF_GPIO_PIN_MAP(0, 13), _DEF_HIGH, _DEF_LOW}, // LED1
+  {HW_TYPE_DT , &dt_led2,                   0, _DEF_HIGH, _DEF_LOW}, // LED2
+};
 
 
 #ifdef _USE_HW_CLI
@@ -31,7 +46,18 @@ bool ledInit(void)
 
   for (int i=0; i<LED_MAX_CH; i++)
   {
-    nrf_gpio_cfg_output(led_tbl[i].pin);
+    if (led_tbl[i].type == HW_TYPE_NRF)
+    {
+      nrf_gpio_cfg_output(led_tbl[i].pin);
+    }
+    else
+    {
+      if (gpio_pin_configure_dt(led_tbl[i].p_dt, GPIO_OUTPUT_ACTIVE) < 0)
+      {
+        ret = false;
+      }
+    }
+
     ledOff(i);
   }
 
@@ -57,21 +83,30 @@ void ledOn(uint8_t ch)
 {
   if (ch >= LED_MAX_CH) return;
 
-  nrf_gpio_pin_write(led_tbl[ch].pin, led_tbl[ch].on_state);
+  if (led_tbl[ch].type == HW_TYPE_NRF)
+    nrf_gpio_pin_write(led_tbl[ch].pin, led_tbl[ch].on_state);
+  else
+    gpio_pin_set_dt(led_tbl[ch].p_dt, led_tbl[ch].on_state);
 }
 
 void ledOff(uint8_t ch)
 {
   if (ch >= LED_MAX_CH) return;
 
-  nrf_gpio_pin_write(led_tbl[ch].pin, led_tbl[ch].off_state);
+  if (led_tbl[ch].type == HW_TYPE_NRF)
+    nrf_gpio_pin_write(led_tbl[ch].pin, led_tbl[ch].off_state);
+  else
+    gpio_pin_set_dt(led_tbl[ch].p_dt, led_tbl[ch].off_state);
 }
 
 void ledToggle(uint8_t ch)
 {
   if (ch >= LED_MAX_CH) return;
 
-  nrf_gpio_pin_toggle(led_tbl[ch].pin);
+  if (led_tbl[ch].type == HW_TYPE_NRF)
+    nrf_gpio_pin_toggle(led_tbl[ch].pin);
+  else
+    gpio_pin_toggle_dt(led_tbl[ch].p_dt);
 }
 
 

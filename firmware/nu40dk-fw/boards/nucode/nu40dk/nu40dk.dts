@@ -11,6 +11,14 @@
 		zephyr,flash = &flash0;
 		zephyr,code-partition = &slot0_partition;
 	};
+
+  leds {
+    compatible = "gpio-leds";
+    led2: led2 {
+      gpios = <&gpio0 14 0>;
+      label = "LED2";
+    };
+  };
 };
 
 &flash0 {
@@ -39,4 +47,12 @@
 			reg = <0x000f8000 DT_SIZE_K(32)>;
 		};
 	};
+};
+
+&gpio0 {
+  status = "okay";
+};
+
+&gpiote {
+  status = "okay";
 };
