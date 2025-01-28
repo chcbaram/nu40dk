@@ -15,7 +15,7 @@ void delay(uint32_t ms)
 {
   if (ms > 0)
   {
-    k_sleep(K_MSEC(ms));
+    k_msleep(ms);
   }
 }
 
