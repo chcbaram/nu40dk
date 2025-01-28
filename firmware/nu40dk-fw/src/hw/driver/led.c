@@ -3,9 +3,6 @@
 
 #ifdef _USE_HW_LED
 #include "cli.h"
-// #include <zephyr/kernel.h>
-// #include <zephyr/device.h>
-// #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
 
 
