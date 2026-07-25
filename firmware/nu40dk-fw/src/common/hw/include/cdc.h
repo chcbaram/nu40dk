@@ -16,6 +16,7 @@ extern "C" {
 bool     cdcInit(void);
 bool     cdcIsInit(void);
 bool     cdcIsConnect(void);
+bool     cdcWaitRx(uint32_t timeout_ms);
 uint32_t cdcAvailable(void);
 uint8_t  cdcRead(void);
 uint32_t cdcWrite(uint8_t *p_data, uint32_t length);

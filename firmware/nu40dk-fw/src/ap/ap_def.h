@@ -4,5 +4,7 @@
 
 #include "hw.h"
 
+#include "module.h"
+
 
 #endif

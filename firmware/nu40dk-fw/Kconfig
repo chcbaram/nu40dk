@@ -38,4 +38,20 @@ config CDC_ACM_SERIAL_PRODUCT_STRING
 
 endif # APP_USE_CLI
 
+config APP_USE_HEARTBEAT_LED
+	bool "하트비트 LED"
+	default y
+	help
+	  LED1 을 500ms 주기로 깜빡인다.
+	  실측 기준 LED 1개가 1~2mA 를 먹으므로 소비전류 측정시에는 끈다.
+
+config APP_POWER_TEST
+	bool "부팅 후 System OFF (소비전류 바닥값 측정)"
+	default n
+	select POWEROFF
+	help
+	  부팅하고 3초 뒤에 System OFF 로 들어간다. MCU 가 완전히 꺼지므로
+	  이때 측정되는 전류가 보드(LDO/표시LED/분압)만의 소비이며,
+	  이 보드에서 펌웨어로 도달 가능한 최소값이다. 복귀는 리셋.
+
 source "Kconfig.zephyr"

@@ -17,6 +17,10 @@ static bool      is_init = false;
 static uint8_t   rx_buf[CDC_RX_BUF_LENGTH];
 static qbuffer_t rx_q;
 
+// 수신 이벤트. 폴링 대신 이걸로 깨어나야 유휴 시간에 코어가 잠든다.
+//
+static K_SEM_DEFINE(rx_sem, 0, 1);
+
 const static struct device *p_cdc_dev = DEVICE_DT_GET(DT_NODELABEL(cdc_acm_uart0));
 
 
@@ -95,7 +99,28 @@ void cdcIsrRx(const struct device *p_dev, void *p_arg)
     }
 
     qbufferWrite(&rx_q, rx_data, (uint32_t)rx_len);
+
+    k_sem_give(&rx_sem);
   }
+}
+
+// 수신 데이터가 들어올 때까지 블록한다.
+// timeout_ms 동안 없으면 false 를 돌려주며, 이때도 코어는 잠들어 있다.
+//
+bool cdcWaitRx(uint32_t timeout_ms)
+{
+  if (is_init != true)
+  {
+    delay(timeout_ms);
+    return false;
+  }
+
+  if (qbufferAvailable(&rx_q) > 0)
+  {
+    return true;
+  }
+
+  return k_sem_take(&rx_sem, K_MSEC(timeout_ms)) == 0 ? true : false;
 }
 
 uint32_t cdcAvailable(void)

@@ -5,6 +5,7 @@
 #include "cli.h"
 #include <zephyr/kernel.h>
 #include <zephyr/sys/reboot.h>
+#include <zephyr/sys/poweroff.h>
 #include <hal/nrf_power.h>
 
 
@@ -152,11 +153,23 @@ void cliReset(cli_args_t *args)
     ret = true;
   }
 
+  // System OFF. MCU 를 완전히 끄므로 남는 전류는 보드(LDO/표시LED/분압) 몫이다.
+  // 소비전류의 바닥값을 확인할 때 쓴다. 복귀는 리셋 버튼.
+  //
+  if (args->argc == 1 && args->isStr(0, "off"))
+  {
+    cliPrintf("system off...\n");
+    delay(100);
+    sys_poweroff();
+    ret = true;
+  }
+
   if (ret != true)
   {
     cliPrintf("reset info\n");
     cliPrintf("reset reset\n");
     cliPrintf("reset boot\n");
+    cliPrintf("reset off\n");
   }
 }
 

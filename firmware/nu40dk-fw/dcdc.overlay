@@ -1,0 +1,14 @@
+/*
+ * 내부 REG1 을 DC/DC 모드로 전환한다.
+ *
+ *   west build ... -- -DEXTRA_DTC_OVERLAY_FILE=dcdc.overlay
+ *
+ * SB6 실장(VDDH=VDD, 일반 전압 모드)이므로 REG0 는 바이패스되고 REG1 만 의미가 있다.
+ * REG1 의 DC/DC 는 DCC 핀 인덕터가 필요한데 모듈(NCRB40N01VC) 외부에는 없다.
+ * 내장돼 있으면 전류가 내려가고, 없으면 부팅이 불안정해진다 — 그때는 이 오버레이 없이
+ * 다시 플래시하면 복구된다.
+ */
+
+&reg1 {
+	regulator-initial-mode = <NRF5X_REG_MODE_DCDC>;
+};

@@ -37,8 +37,19 @@
 #define _USE_CLI_HW_LED             1
 #define _USE_CLI_HW_UART            1
 #define _USE_CLI_HW_RESET           1
+#define _USE_CLI_HW_MODULE          1
+#define _USE_CLI_HW_DISPLAY         1
 
 #endif
+
+
+//-- RTOS
+//
+#define _HW_DEF_RTOS_THREAD_PRI_CLI           5
+#define _HW_DEF_RTOS_THREAD_PRI_DISPLAY       5
+
+#define _HW_DEF_RTOS_THREAD_MEM_CLI           (4*1024)
+#define _HW_DEF_RTOS_THREAD_MEM_DISPLAY       (1*1024)
 
 
 #endif

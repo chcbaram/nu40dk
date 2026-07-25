@@ -14,23 +14,30 @@ file(GLOB SRC_FILES CONFIGURE_DEPENDS
 # 하위폴더에 있는 파일까지 포함한다.
 #
 file(GLOB_RECURSE SRC_FILES_RECURSE CONFIGURE_DEPENDS
+  src/ap/modules/*.c
   src/bsp/*.c
   src/common/*.c
   src/hw/*.c
 )
 
-target_sources(app PRIVATE 
+target_sources(app PRIVATE
   ${SRC_FILES}
   ${SRC_FILES_RECURSE}
 )
 
-target_include_directories(app PRIVATE 
-  src  
+target_include_directories(app PRIVATE
+  src
   src/ap
-  src/bsp  
+  src/ap/modules
+  src/ap/modules/common
+  src/bsp
   src/common
   src/common/core
   src/common/hw/include
   src/hw
   src/lib
 )
+
+# 모듈 등록용 .module 섹션 (module.h 의 MODULE_DEF)
+#
+zephyr_linker_sources(SECTIONS src/bsp/ldscript/ldscript.ld)
