@@ -14,9 +14,22 @@
 
 #define _USE_HW_RESET
 
+#define _USE_HW_UART
+#define      HW_UART_MAX_CH         1
+#define      HW_UART_CH_CLI         _DEF_UART1
+
+#define _USE_HW_CLI
+#define      HW_CLI_CMD_LIST_MAX    32
+#define      HW_CLI_CMD_NAME_MAX    16
+#define      HW_CLI_LINE_HIS_MAX    8
+#define      HW_CLI_LINE_BUF_MAX    64
+
 
 //-- CLI
 //
+#define _USE_CLI_HW_LED             1
+#define _USE_CLI_HW_UART            1
+#define _USE_CLI_HW_RESET           1
 
 
 #endif

@@ -2,6 +2,7 @@
 
 
 #ifdef _USE_HW_RESET
+#include "cli.h"
 #include <zephyr/kernel.h>
 #include <zephyr/sys/reboot.h>
 #include <hal/nrf_power.h>
@@ -20,6 +21,10 @@
 
 
 static uint32_t reset_bits = 0;
+
+#if CLI_USE(HW_RESET)
+static void cliReset(cli_args_t *args);
+#endif
 
 
 bool resetInit(void)
@@ -50,6 +55,10 @@ bool resetInit(void)
   {
     reset_bits |= (1<<RESET_BIT_ETC);
   }
+
+#if CLI_USE(HW_RESET)
+  cliAdd("reset", cliReset);
+#endif
 
   return true;
 }
@@ -103,6 +112,55 @@ uint32_t resetGetBootMode(void)
 {
   return nrf_power_gpregret_get(NRF_POWER, GPREGRET_BOOT_MODE);
 }
+
+
+#if CLI_USE(HW_RESET)
+
+void cliReset(cli_args_t *args)
+{
+  bool ret = false;
+
+
+  if (args->argc == 1 && args->isStr(0, "info"))
+  {
+    const char *p_str[RESET_BIT_MAX] = {"POWER", "PIN", "WDG", "SOFT", "ETC"};
+
+    for (int i=0; i<RESET_BIT_MAX; i++)
+    {
+      if (reset_bits & (1<<i))
+      {
+        cliPrintf("Reset     : %s\n", p_str[i]);
+      }
+    }
+    cliPrintf("Boot mode : 0x%02X\n", resetGetBootMode());
+    ret = true;
+  }
+
+  if (args->argc == 1 && args->isStr(0, "reset"))
+  {
+    cliPrintf("reset...\n");
+    delay(100);
+    resetToReset();
+    ret = true;
+  }
+
+  if (args->argc == 1 && args->isStr(0, "boot"))
+  {
+    cliPrintf("enter dfu...\n");
+    delay(100);
+    resetToBoot();
+    ret = true;
+  }
+
+  if (ret != true)
+  {
+    cliPrintf("reset info\n");
+    cliPrintf("reset reset\n");
+    cliPrintf("reset boot\n");
+  }
+}
+
+#endif
 
 
 #endif

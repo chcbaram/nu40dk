@@ -3,43 +3,23 @@
 
 
 
-
-
 void apInit(void)
 {
 }
 
 void apMain(void)
 {
+  uint32_t pre_time = millis();
+
+
   while(1)
   {
-    // 1. 순차 점등
-    //
-    for (int i=0; i<LED_MAX_CH; i++)
+    if (millis()-pre_time >= 500)
     {
-      ledOn(i);
-      delay(200);
+      pre_time = millis();
+      ledToggle(_DEF_LED1);
     }
 
-    // 2. 순차 소등
-    //
-    for (int i=0; i<LED_MAX_CH; i++)
-    {
-      ledOff(i);
-      delay(200);
-    }
-
-    // 3. 전체 점멸
-    //
-    for (int i=0; i<6; i++)
-    {
-      for (int j=0; j<LED_MAX_CH; j++)
-      {
-        ledToggle(j);
-      }
-      delay(300);
-    }
-
-    delay(500);
+    cliMain();
   }
 }
