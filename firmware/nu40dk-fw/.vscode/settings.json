@@ -1,0 +1,43 @@
+{
+	// Actions 메뉴의 Flash / Erase and Flash 를 pyOCD 태스크로 대체한다.
+	//
+	"nrf-connect.taskBindings": {
+		"build": [
+			{
+				"taskName": "build-Build (west)"
+			}
+		],
+		"pristineBuild": [
+			{
+				"taskName": "build-ReBuild (west)"
+			}
+		],
+		"flash": [
+			{
+				"taskName": "flash-Flash (pyOCD)"
+			}
+		],
+		"eraseAndFlash": [
+			{
+				"taskName": "flash-Erase and Flash (pyOCD)"
+			}
+		]
+	},
+
+	// Actions 메뉴의 Debug 를 cortex-debug pyOCD 설정으로 연결한다.
+	// 확장 자체 디버거는 J-Link GDB Server 전용이라 CMSIS-DAP 로는 붙지 않는다.
+	//
+	// sysbuild 라서 디버그 실행시 조회되는 경로는 도메인 폴더(build/nu40dk-fw)다.
+	// build 키는 Actions 트리 라벨 표시용, 도메인 키가 실제 실행에 쓰인다.
+	//
+	"nrf-connect.debugging.bindings": {
+		"${workspaceFolder}/build": "Debug with pyOCD (NU-DAP)",
+		"${workspaceFolder}/build/nu40dk-fw": "Debug with pyOCD (NU-DAP)"
+	},
+
+	// 디버그 시작 전에 확장이 자체 도구(nrfutil)로 플래시하는 단계를 끈다.
+	// nrfutil 은 CMSIS-DAP 프로브를 flash: false 로 보고해서 실패한다.
+	// 대신 cortex-debug 가 gdb load 로 프로그래밍한다.
+	//
+	"nrf-connect.debugging.flash": false
+}

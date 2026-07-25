@@ -1,0 +1,82 @@
+{
+	"version": "2.0.0",
+	// nrf-connect-process 타입은 셸을 거치지 않고 확장의 빌드 환경에서 직접 실행한다.
+	// nrf-connect-shell 은 로그인 셸(zsh -l)로 돌아서 ~/.zprofile 의 brew shellenv 가
+	// PATH 앞에 끼어들고, 그 결과 툴체인 대신 시스템 도구(ccache 등)가 잡힌다.
+	//
+	"tasks": [
+		{
+			"label": "build-Build (west)",
+			"type": "nrf-connect-process",
+			"command": "west",
+			"args": [
+				"build",
+				"--build-dir",
+				"${workspaceFolder}/build",
+				"${workspaceFolder}"
+			],
+			"cwd": "${workspaceFolder}",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			]
+		},
+		{
+			// 전체 재빌드. cmake 를 다시 돌리므로 board / BOARD_ROOT 를 넘겨야 한다.
+			//
+			"label": "build-ReBuild (west)",
+			"type": "nrf-connect-process",
+			"command": "west",
+			"args": [
+				"build",
+				"--build-dir",
+				"${workspaceFolder}/build",
+				"${workspaceFolder}",
+				"--pristine",
+				"--board",
+				"nu40dk/nrf52840",
+				"--",
+				"-DBOARD_ROOT=${workspaceFolder}"
+			],
+			"cwd": "${workspaceFolder}",
+			"problemMatcher": [
+				"$gcc"
+			]
+		},
+		{
+			// 확장의 Flash 액션은 J-Link/nrfjprog(SEGGER 시리얼) 기준이라
+			// CMSIS-DAP 프로브에서는 동작하지 않는다. west flash 를 pyocd 러너로 직접 호출한다.
+			//
+			"label": "flash-Flash (pyOCD)",
+			"type": "nrf-connect-process",
+			"command": "west",
+			"args": [
+				"flash",
+				"--build-dir",
+				"${workspaceFolder}/build",
+				"--runner",
+				"pyocd"
+			],
+			"cwd": "${workspaceFolder}",
+			"problemMatcher": []
+		},
+		{
+			"label": "flash-Erase and Flash (pyOCD)",
+			"type": "nrf-connect-process",
+			"command": "west",
+			"args": [
+				"flash",
+				"--build-dir",
+				"${workspaceFolder}/build",
+				"--runner",
+				"pyocd",
+				"--erase"
+			],
+			"cwd": "${workspaceFolder}",
+			"problemMatcher": []
+		}
+	]
+}

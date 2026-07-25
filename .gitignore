@@ -10,3 +10,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+
+# 전역 gitignore 의 settings.json 규칙 예외.
+# nRF Connect Actions(Flash/Debug) 바인딩이 들어 있어 공유해야 한다.
+!firmware/nu40dk-fw/.vscode/settings.json

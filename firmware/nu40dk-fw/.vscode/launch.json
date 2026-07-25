@@ -1,22 +1,39 @@
 {
 	"version": "0.2.0",
 	"configurations": [
-
 		{
 			"cwd": "${workspaceRoot}",
 			"executable": "build/nu40dk-fw/zephyr/zephyr.elf",
-			"name": "Debug with OpenOCD",
+			"name": "Debug with pyOCD (NU-DAP)",
 			"request": "launch",
 			"type": "cortex-debug",
-			"servertype": "openocd",
-			"windows": {
-				"serverpath": "D:/tools/openocd/OpenOCD-20240916-0.12.0/bin/openocd"
-			},
-			"configFiles": [
-				"interface/stlink.cfg",
-				"target/nrf52.cfg"
+			"servertype": "pyocd",
+			"targetId": "nrf52840",
+			// pyOCD 0.42는 "GDB server listening on port" 로 출력하는데
+			// cortex-debug 1.12는 "GDB server started at/on port" 를 기다려서 타임아웃 난다.
+			//
+			"overrideGDBServerStartedRegex": "GDB server listening on port",
+			"serverArgs": [
+				"--frequency",
+				"4000000"
 			],
-			"searchDir": [],
+			// PC 마다 툴체인 경로가 다르므로 아래를 직접 수정한다.
+			// 경로는 python3 tools/find_toolchain.py --apply 로 찾을 수 있다.
+			// 지우면 PATH 또는 user settings 의 cortex-debug.pyocdPath.<os> / gdbPath.<os> 를 사용한다.
+			//
+			"osx": {
+				"serverpath": "/opt/nordic/ncs/toolchains/0c0f19d91c/bin/pyocd",
+				"gdbPath": "/opt/nordic/ncs/toolchains/0c0f19d91c/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb"
+			},
+			"windows": {
+				"serverpath": "C:/ncs/toolchains/<bundle-id>/bin/pyocd.exe",
+				"gdbPath": "C:/ncs/toolchains/<bundle-id>/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb.exe"
+			},
+			"linux": {
+				"serverpath": "/home/<user>/ncs/toolchains/<bundle-id>/bin/pyocd",
+				"gdbPath": "/home/<user>/ncs/toolchains/<bundle-id>/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb"
+			},
+			"svdFile": "${workspaceFolder}/tools/svd/nrf52840.svd",
 			"runToEntryPoint": "main",
 			"showDevDebugOutput": "none"
 		},
