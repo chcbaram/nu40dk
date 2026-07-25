@@ -6,28 +6,17 @@
 #include <zephyr/drivers/gpio.h>
 
 
-enum
-{
-  HW_TYPE_NRF,
-  HW_TYPE_DT
-};
-
 typedef struct
 {
-  uint8_t   type;
-  struct gpio_dt_spec *p_dt;  
-  uint32_t  pin;  
-  uint8_t   on_state;
-  uint8_t   off_state;
+  struct gpio_dt_spec h_dt;
 } led_tbl_t;
 
 
-static struct gpio_dt_spec dt_led2 = GPIO_DT_SPEC_GET(DT_NODELABEL(led2), gpios);
-
-
 const led_tbl_t led_tbl[LED_MAX_CH] = {
-  {HW_TYPE_NRF, NULL, NRF_GPIO_PIN_MAP(0, 13), _DEF_HIGH, _DEF_LOW}, // LED1
-  {HW_TYPE_DT , &dt_led2,                   0, _DEF_HIGH, _DEF_LOW}, // LED2
+  {GPIO_DT_SPEC_GET(DT_NODELABEL(led1), gpios)}, // LED1, P0.13
+  {GPIO_DT_SPEC_GET(DT_NODELABEL(led2), gpios)}, // LED2, P0.14
+  {GPIO_DT_SPEC_GET(DT_NODELABEL(led3), gpios)}, // LED3, P0.15
+  {GPIO_DT_SPEC_GET(DT_NODELABEL(led4), gpios)}, // LED4, P0.16
 };
 
 
@@ -43,19 +32,18 @@ bool ledInit(void)
 
   for (int i=0; i<LED_MAX_CH; i++)
   {
-    if (led_tbl[i].type == HW_TYPE_NRF)
+    if (gpio_is_ready_dt(&led_tbl[i].h_dt) != true)
     {
-      nrf_gpio_cfg_output(led_tbl[i].pin);
-    }
-    else
-    {
-      if (gpio_pin_configure_dt(led_tbl[i].p_dt, GPIO_OUTPUT_ACTIVE) < 0)
-      {
-        ret = false;
-      }
+      ret = false;
+      continue;
     }
 
-    ledOff(i);
+    // 회로도상 Active Low 이므로 극성은 디바이스 트리에서 처리한다.
+    //
+    if (gpio_pin_configure_dt(&led_tbl[i].h_dt, GPIO_OUTPUT_INACTIVE) < 0)
+    {
+      ret = false;
+    }
   }
 
 #ifdef _USE_HW_CLI
@@ -67,10 +55,12 @@ bool ledInit(void)
 
 bool ledToSleep(void)
 {
+  // LED 구동단이 CMOS 인버터(NC7WZ14) 입력이므로 핀을 끊으면 입력이 플로팅되어
+  // 관통 전류가 흐른다. 슬립 진입시에도 출력 상태를 유지한 채로 끈다.
+  //
   for (int i=0; i<LED_MAX_CH; i++)
   {
     ledOff(i);
-    nrf_gpio_cfg_default(led_tbl[i].pin);
   }
 
   return true;
@@ -80,30 +70,21 @@ void ledOn(uint8_t ch)
 {
   if (ch >= LED_MAX_CH) return;
 
-  if (led_tbl[ch].type == HW_TYPE_NRF)
-    nrf_gpio_pin_write(led_tbl[ch].pin, led_tbl[ch].on_state);
-  else
-    gpio_pin_set_dt(led_tbl[ch].p_dt, led_tbl[ch].on_state);
+  gpio_pin_set_dt(&led_tbl[ch].h_dt, 1);
 }
 
 void ledOff(uint8_t ch)
 {
   if (ch >= LED_MAX_CH) return;
 
-  if (led_tbl[ch].type == HW_TYPE_NRF)
-    nrf_gpio_pin_write(led_tbl[ch].pin, led_tbl[ch].off_state);
-  else
-    gpio_pin_set_dt(led_tbl[ch].p_dt, led_tbl[ch].off_state);
+  gpio_pin_set_dt(&led_tbl[ch].h_dt, 0);
 }
 
 void ledToggle(uint8_t ch)
 {
   if (ch >= LED_MAX_CH) return;
 
-  if (led_tbl[ch].type == HW_TYPE_NRF)
-    nrf_gpio_pin_toggle(led_tbl[ch].pin);
-  else
-    gpio_pin_toggle_dt(led_tbl[ch].p_dt);
+  gpio_pin_toggle_dt(&led_tbl[ch].h_dt);
 }
 
 

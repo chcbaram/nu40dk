@@ -1,5 +1,6 @@
 /dts-v1/;
 #include <nordic/nrf52840_qiaa.dtsi>
+#include <zephyr/dt-bindings/gpio/gpio.h>
 #include "nu40dk-pinctrl.dtsi"
 
 / {
@@ -14,9 +15,21 @@
 
   leds {
     compatible = "gpio-leds";
+    led1: led1 {
+      gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
+      label = "LED1";
+    };
     led2: led2 {
-      gpios = <&gpio0 14 0>;
+      gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
       label = "LED2";
+    };
+    led3: led3 {
+      gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
+      label = "LED3";
+    };
+    led4: led4 {
+      gpios = <&gpio0 16 GPIO_ACTIVE_LOW>;
+      label = "LED4";
     };
   };
 };
