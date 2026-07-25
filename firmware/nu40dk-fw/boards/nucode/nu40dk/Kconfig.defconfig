@@ -1,6 +1,6 @@
 if BOARD_NU40DK
 
-config BT_CTLR
-	default BT
+config HW_STACK_PROTECTION
+	default ARCH_HAS_STACK_PROTECTION
 
 endif # BOARD_NU40DK
