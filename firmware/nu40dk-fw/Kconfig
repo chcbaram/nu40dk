@@ -1,0 +1,41 @@
+# nu40dk-fw 애플리케이션 전용 설정
+#
+# 여기서 켠 스위치 하나로 C 코드(hw_def.h)와 Zephyr 설정이 함께 따라간다.
+
+config APP_USE_CLI
+	bool "USB CDC CLI 사용"
+	default y
+	help
+	  USB CDC 로 동작하는 CLI 를 포함한다.
+	  저전력 동작이 필요하면 이 옵션을 끈다. USB 디바이스 스택과 UART 드라이버,
+	  CLI 코드가 모두 빌드에서 빠진다.
+
+if APP_USE_CLI
+
+config SERIAL
+	default y
+
+config UART_INTERRUPT_DRIVEN
+	default y
+
+config UART_LINE_CTRL
+	default y
+
+config USB_DEVICE_STACK_NEXT
+	default y
+
+config USBD_CDC_ACM_CLASS
+	default y
+
+config CDC_ACM_SERIAL_INITIALIZE_AT_BOOT
+	default y
+
+config CDC_ACM_SERIAL_MANUFACTURER_STRING
+	default "NUCODE"
+
+config CDC_ACM_SERIAL_PRODUCT_STRING
+	default "NU40DK CLI"
+
+endif # APP_USE_CLI
+
+source "Kconfig.zephyr"

@@ -14,9 +14,16 @@
 
 #define _USE_HW_RESET
 
+// CLI 는 Kconfig 의 APP_USE_CLI 로 켜고 끈다. (prj.conf / low_power.conf)
+//
+#ifdef CONFIG_APP_USE_CLI
+
+#define _USE_HW_CDC
+
 #define _USE_HW_UART
 #define      HW_UART_MAX_CH         1
-#define      HW_UART_CH_CLI         _DEF_UART1
+#define      HW_UART_CH_USB         _DEF_UART1
+#define      HW_UART_CH_CLI         HW_UART_CH_USB
 
 #define _USE_HW_CLI
 #define      HW_CLI_CMD_LIST_MAX    32
@@ -30,6 +37,8 @@
 #define _USE_CLI_HW_LED             1
 #define _USE_CLI_HW_UART            1
 #define _USE_CLI_HW_RESET           1
+
+#endif
 
 
 #endif
